@@ -7,3 +7,4 @@ RUN npm install
 USER 1001
 EXPOSE 4000
 CMD ["node","index.js"]
+ENV NODE_ENV=production

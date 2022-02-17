@@ -26,7 +26,7 @@ services:
     ports:
       - 8082:80
   app:
-    image: tomwallyn/mspr-node:v1.0.0
+    image: tomwallyn/mspr-node:latest
     container_name: node_app
     links:
       - db
