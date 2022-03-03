@@ -1,0 +1,53 @@
+name: Deploy Docker Image
+
+on:
+  create:
+    tags:
+      - v*
+
+jobs:
+
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: tomwallyn
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      -
+        uses : actions/checkout@v2
+        
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v2
+        with: # in production, fix the version of your dependencies
+          buildx-version: latest
+          skip-cache: false
+          qemu-version: latest
+        
+      - 
+        name : Build and Deploy
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 -t tomwallyn/mspr-node:${GITHUB_REF##*/} . --push
+          
+  deploy-raspberry:
+    name: Deploy in prod
+    runs-on: ubuntu-latest
+    needs: build-deploy
+    env:
+      GITHUB_TAG : ${{github.ref_name}}
+    steps:
+    - name: executing remote ssh to deploy last version
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        envs: GITHUB_TAG
+        script: |
+          docker stop mspr-node || true && docker rm mspr-node || true
+          docker pull tomwallyn/mspr-node:$GITHUB_TAG
