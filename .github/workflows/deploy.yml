@@ -49,5 +49,4 @@ jobs:
         port: ${{ secrets.PORT }}
         envs: GITHUB_TAG
         script: |
-          docker stop mspr-node || true && docker rm mspr-node || true
           docker pull tomwallyn/mspr-node:$GITHUB_TAG
