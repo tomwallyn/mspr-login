@@ -15,6 +15,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'static')));
 
+var ActiveDirectory = require('activedirectory');
+var config = { url: 'ldap://AD.mspr.local',//172.16.147.128
+               baseDN: 'dc=mspr,dc=local',
+               username: 'MSPR\\MSPR',
+               password: 'Azerty123' }
+var ad = new ActiveDirectory(config);
+
+var username = 'john.smith@domain.com';
+var password = 'password';
+ 
+ad.authenticate(username, password, function(err, auth) {
+  if (err) {
+    console.log('ERROR: '+JSON.stringify(err));
+    return;
+  }
+  
+  if (auth) {
+    console.log('Authenticated!');
+  }
+  else {
+    console.log('Authentication failed!');
+  }
+});
+
 const appli = require("./app/route");
 const login = require("./login/route");
 const auth = require("./authentification/route");
