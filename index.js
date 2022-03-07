@@ -32,7 +32,7 @@ app.use(auth);
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 
-httpServer.listen(4000);
-httpsServer.listen(4001);
+httpServer.listen(4001);
+httpsServer.listen(4000);
 
 console.log("Environment : "+global.AUTH.env)
