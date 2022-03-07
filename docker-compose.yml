@@ -14,7 +14,7 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
   app:
-    image: tomwallyn/mspr-node:latest
+    image: tomwallyn/mspr-node:v0.03
     container_name: node_app
     links:
       - db

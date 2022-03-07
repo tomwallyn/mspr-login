@@ -3,7 +3,7 @@ var mysql = require('mysql');
 require('../helpers/config');
 
 var ActiveDirectory = require('activedirectory');
-var config = { url: 'ldap://172.16.147.130:389',
+var config = { url: 'ldap://192.168.5.97:389',
                baseDN: 'DC=mspr,DC=com',
                username: 'administrateur@mspr.com',
                password: 'Azerty123' }
