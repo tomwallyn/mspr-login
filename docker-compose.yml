@@ -20,6 +20,6 @@ services:
       - db
     restart: always
     ports:
-      - 8050:4000
+      - 8060:4000
 volumes:
   dbdata:
