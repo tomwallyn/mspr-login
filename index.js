@@ -3,6 +3,12 @@ var session = require('express-session');
 const app = express();
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var privateKey  = fs.readFileSync('sslcert/key.pem', 'utf8');
+var certificate = fs.readFileSync('sslcert/cert.pem', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
 require('./helpers/config');
 
 app.use(cookieParser());
@@ -15,30 +21,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'static')));
 
-var ActiveDirectory = require('activedirectory');
-var config = { url: 'ldap://AD.mspr.local',//172.16.147.128
-               baseDN: 'dc=mspr,dc=local',
-               username: 'MSPR\\MSPR',
-               password: 'Azerty123' }
-var ad = new ActiveDirectory(config);
-
-var username = 'john.smith@domain.com';
-var password = 'password';
- 
-ad.authenticate(username, password, function(err, auth) {
-  if (err) {
-    console.log('ERROR: '+JSON.stringify(err));
-    return;
-  }
-  
-  if (auth) {
-    console.log('Authenticated!');
-  }
-  else {
-    console.log('Authentication failed!');
-  }
-});
-
 const appli = require("./app/route");
 const login = require("./login/route");
 const auth = require("./authentification/route");
@@ -47,5 +29,10 @@ app.use("/app", appli);
 app.use("/login", login);
 app.use(auth);
 
-app.listen(4000);
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(4000);
+httpsServer.listen(4001);
+
 console.log("Environment : "+global.AUTH.env)

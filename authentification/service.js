@@ -2,6 +2,13 @@ var nodemailer = require('nodemailer');
 var mysql = require('mysql');
 require('../helpers/config');
 
+var ActiveDirectory = require('activedirectory');
+var config = { url: 'ldap://172.16.147.130:389',
+               baseDN: 'DC=mspr,DC=com',
+               username: 'administrateur@mspr.com',
+               password: 'Azerty123' }
+var ad = new ActiveDirectory(config);
+
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -36,9 +43,9 @@ module.exports = {
         });
     },
     
-    checkIp: function(idUser, ip) {
+    checkIp: function(username, ip) {
         return new Promise(function (resolve, reject) {
-            return connection.query("SELECT * FROM ipAdresse WHERE idUser = ? AND ipAdresse = ? AND status = 'logged'", [idUser, ip], function(error, results, fields) {
+            return connection.query("SELECT * FROM ip_adresse WHERE username = ? AND ip = ?", [username, ip], function(error, results, fields) {
                 // If there is an issue with the query, output the error
                 if (error) throw error;
                 // If the account exists
@@ -51,9 +58,9 @@ module.exports = {
         });
     },
     
-    checkNavigator: function(idUser, navigator) {
+    checkNavigator: function(username, navigator) {
         return new Promise(function (resolve, reject) {
-            return connection.query("SELECT * FROM ipAdresse WHERE idUser = ? AND navigator = ? AND status = 'logged'", [idUser, navigator], function(error, results, fields) {
+            return connection.query("SELECT * FROM navigator WHERE username = ? AND navigator = ?", [username, navigator], function(error, results, fields) {
                 // If there is an issue with the query, output the error
                 if (error) throw error;
                 // If the account exists
@@ -66,13 +73,14 @@ module.exports = {
         });
     },
     
-    check2fa: function(code, idUser, ip) {
+    check2fa: function(code, username, ip) {
         return new Promise(function (resolve, reject) {
-            return connection.query('SELECT * FROM 2fa WHERE token = ? AND idUser = ? AND ip = ?', [code, idUser, ip], function(error, results, fields) {
+            return connection.query('SELECT * FROM 2fa WHERE token = ? AND username = ? AND ip = ?', [code, username, ip], function(error, results, fields) {
                 // If there is an issue with the query, output the error
                 if (error) throw error;
                 // If the account exists
                 if (results.length > 0) {
+                    module.exports.delete2fa(code, username, ip);
                     resolve(true);
                 } else {
                     resolve(false);
@@ -80,6 +88,13 @@ module.exports = {
             });
         });
     },
+
+    delete2fa: function(code, username, ip) {
+        return new Promise(function (resolve, reject) {
+                connection.query('DELETE FROM 2fa WHERE token = ? AND username = ? AND ip = ?', [code, username, ip], function(error, results, fields) {
+                });
+        });
+    }, 
     
     generateToken: function() {
         return new Promise(function (resolve, reject) {
@@ -89,29 +104,51 @@ module.exports = {
         })
     },
     
-    setToken: function(idUser, ip, mail) {
+    setToken: function(username, mail, ip) {
         return new Promise(function (resolve, reject) {
             module.exports.generateToken().then(function (token){
-                connection.query('INSERT INTO 2fa (token, idUser, ip) VALUES (?, ?, ?)', [token, idUser, ip], function(error, results, fields) {
-                    module.exports.sendMail(mail, "2FA Connect", `<a href=\"${global.AUTH.url_front}/2fa/${token}/${idUser}\">Click to connect with 2FA</a>`)
+                connection.query('INSERT INTO 2fa (token, username, ip) VALUES (?, ?, ?)', [token, username, ip], function(error, results, fields) {
+                    module.exports.sendMail(mail, "2FA Connect", `<a href=\"${global.AUTH.url_front}/2fa/${token}/${username}\">Click to connect with 2FA</a>`)
                 });
             })
         });
     },
 
-    getUser: function(idUser) {
+    getUser: function(username) {
         return new Promise(function (resolve, reject) {
-                connection.query('SELECT * FROM user WHERE id = ?', [idUser], function(error, results, fields) {
-                    resolve(results);
+            ad.findUser(username, function(err, user) {
+                resolve(user);
+            });
+        });
+    },
+
+    setNewBrowser: function(username, navigator) {
+        return new Promise(function (resolve, reject) {
+                connection.query('INSERT INTO navigator (username, navigator) VALUES (?, ?)', [username, navigator], function(error, results, fields) {
                 });
         });
     },
 
-    setNewBrowser: function(idUser, ip, navigator, status) {
+    saveIpAdresse: function(username, ip) {
         return new Promise(function (resolve, reject) {
-                connection.query('INSERT INTO ipAdresse (idUser, ipAdresse, navigator, status) VALUES (?, ?, ?, ?)', [idUser, ip, navigator, status], function(error, results, fields) {
+                connection.query('INSERT INTO ip_adresse (username, ip) VALUES (?, ?)', [username, ip], function(error, results, fields) {
                 });
         });
     },
+
+    checkAuthActiveDirectory: function(username, password) {
+        return new Promise(function (resolve, reject) {
+            ad.authenticate(username, password, function(err, auth) {
+            if (auth) {
+                ad.findUser(username, function(err, user) {
+                    resolve(user.mail);
+                });
+            }
+            else {
+                resolve(false);
+            }
+        });
+    })
+    }
 };
 
