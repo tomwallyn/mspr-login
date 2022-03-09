@@ -56,8 +56,8 @@ Database :
 
 Node server : 
 
-    -   Interne 192.168.5.86:8060
-    -   Externe 92.188.98.73:4000
+    -   Interne 192.168.5.86:8061
+    -   Externe 92.188.98.73:8061
 
 Active Directory :  
 

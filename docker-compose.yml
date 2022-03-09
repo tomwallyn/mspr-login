@@ -14,12 +14,11 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
   app:
-    image: tomwallyn/mspr-node:v1.0.0
+    image: tomwallyn/mspr-node:v0.0.5
     container_name: node_app
     links:
       - db
-    restart: always
     ports:
-      - 8060:4000
+      - 8061:4000
 volumes:
   dbdata:
