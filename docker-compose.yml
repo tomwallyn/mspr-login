@@ -18,8 +18,7 @@ services:
     container_name: node_app
     links:
       - db
-    restart: always
     ports:
-      - 8060:4000
+      - 8061:4000
 volumes:
   dbdata:
