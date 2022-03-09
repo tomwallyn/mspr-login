@@ -2,14 +2,14 @@
 
 Server for the mspr login
 
-## Run in development
+## Run app in development
 
 set process.env.NODE_ENV to 'development'
 ```shell
 npm run start
 ```
 
-## Deploy docker image
+## Deploy docker image in docker hub
 
 Deploy a version
 ```
@@ -29,3 +29,36 @@ run the docker-compose.yml
 ```
 docker-compose up -d
 ```
+
+
+## Config IP
+
+# Development environnement
+
+Database : 
+
+    -   Interne localhost:6033
+
+Node server : 
+
+    -   Interne localhost:4000
+
+Active Directory :  
+
+    -   Interne localhost:389
+
+
+# Production environnement
+
+Database : 
+
+    -   Interne 192.168.5.86:6033
+
+Node server : 
+
+    -   Interne 192.168.5.86:8060
+    -   Externe 92.188.98.73:4000
+
+Active Directory :  
+
+    -   Interne 192.168.5.20:389
