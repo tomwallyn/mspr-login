@@ -1,5 +1,5 @@
 var nodemailer = require('nodemailer');
-var mysql = require('mysql');
+var mysql = require('mysql2');
 require('../helpers/config');
 
 var ActiveDirectory = require('activedirectory');
