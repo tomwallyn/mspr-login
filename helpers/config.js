@@ -10,7 +10,7 @@ if(env === "development") {
 
 } else if(env === "production") {
     global.AUTH = {
-        bdd_ip: 'localhost',
+        bdd_ip: 'db',
         bdd_port: 6033,
         url_front: 'https://92.188.98.73:8061',
         env: "production"
