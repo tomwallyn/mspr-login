@@ -2,7 +2,7 @@ version: '3'
  
 services:
   db:
-    image: mysql:oracle
+    image: mysql:8
     container_name: db
     environment:
       MYSQL_ROOT_PASSWORD: my_secret_password
@@ -10,15 +10,15 @@ services:
       MYSQL_USER: db_user
       MYSQL_PASSWORD: db_user_pass
     ports:
-      - "6033:3306"
+      - 6033:3306
     volumes:
       - dbdata:/var/lib/mysql
   app:
-    image: tomwallyn/mspr-node:v1.0.4
+    image: tomwallyn/mspr-node:v1.1.1
     container_name: node_app
-    links:
-      - db
     ports:
       - 8061:4000
+    links:
+      - db
 volumes:
   dbdata:
