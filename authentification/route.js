@@ -37,33 +37,38 @@ router.get('/2fa/:code/:username', function(req, res){
 })
 
 router.post('/auth', limiter, function(request, response) {
-    console.log("Ip adresse : "+requestIp.getClientIp(request))
+    console.log("Ipv6 adresse : "+requestIp.getClientIp(request))
     console.log("Navigator : "+request.headers['user-agent'])
     // Capture the input fields
     let username = request.body.username;
     let password = request.body.password;
     // Ensure the input fields exists and are not empty
-    if (username && password) {
-        // Execute SQL query that'll select the account from the database based on the specified username and password
-        service.checkAuthActiveDirectory(username, password).then(function(auth){
-            if (auth != false) {
-                service.setToken(username, auth, requestIp.getClientIp(request));
-
-                response.send('An email has been sent!');
-                
-                service.checkIp(username, requestIp.getClientIp(request)).then(function (response){
-                    if(response == false){
-                        service.sendMail(auth, "Tentative de connexion", "Une Ip inabhituelle à essayer de ce connecter à votre compte")
-                    }
-                });
-            } else {
-                response.send('Incorrect Username and/or Password!');
-            }			
+    if(service.checkIpCountry(requestIp.getClientIp(request)) == null || service.checkIpCountry(requestIp.getClientIp(request)).country == 'FR') {
+        if (username && password) {
+            // Execute SQL query that'll select the account from the database based on the specified username and password
+            service.checkAuthActiveDirectory(username, password).then(function(auth){
+                if (auth != false) {
+                    service.setToken(username, auth, requestIp.getClientIp(request));
+    
+                    response.send('An email has been sent!');
+                    
+                    service.checkIp(username, requestIp.getClientIp(request)).then(function (response){
+                        if(response == false){
+                            service.sendMail(auth, "Tentative de connexion", "Une Ip inabhituelle à essayer de ce connecter à votre compte")
+                        }
+                    });
+                } else {
+                    response.status(401);
+                    response.send('Incorrect Username and/or Password!');
+                }			
+                response.end();
+            })
+        } else {
+            response.send('Please enter Username and Password!');
             response.end();
-        })
+        }
     } else {
-        response.send('Please enter Username and Password!');
-        response.end();
+        response.send('Ip non autorisé !');
     }
 });
 

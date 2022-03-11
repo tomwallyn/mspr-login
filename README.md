@@ -52,11 +52,11 @@ Active Directory :
 
 Database : 
 
-    -   Interne 192.168.5.86:6033
+    -   Interne 192.168.5.100:6033
 
 Node server : 
 
-    -   Interne 192.168.5.86:8061
+    -   Interne 192.168.5.100:8061
     -   Externe 92.188.98.73:8061
 Active Directory :  
 

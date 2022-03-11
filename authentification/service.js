@@ -1,6 +1,7 @@
 var nodemailer = require('nodemailer');
 var mysql = require('mysql2');
 require('../helpers/config');
+var geoip = require('geoip-country');
 
 var ActiveDirectory = require('activedirectory');
 var config = { url: 'ldap://192.168.5.20:389',
@@ -56,6 +57,11 @@ module.exports = {
                 }
             });
         });
+    },
+
+    checkIpCountry: function(ip) {
+            var geo = geoip.lookup(ip.split("::ffff:")[1]);
+            return geo;
     },
     
     checkNavigator: function(username, navigator) {

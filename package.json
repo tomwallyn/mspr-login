@@ -26,6 +26,7 @@
     "express-rate-limit": "^6.3.0",
     "express-session": "^1.17.2",
     "fs": "^0.0.1-security",
+    "geoip-country": "^4.0.111",
     "http": "^0.0.1-security",
     "https": "^1.0.0",
     "jwt-simple": "^0.5.6",
