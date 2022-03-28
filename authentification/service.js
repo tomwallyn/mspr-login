@@ -18,13 +18,15 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-var connection = mysql.createConnection({
-    host: global.AUTH.bdd_ip,
-    port: global.AUTH.bdd_port,
-    user: "root",
-    password: "my_secret_password",
-    database: "app_db"
-});
+if (global.AUTH.env !== 'test') { 
+    var connection = mysql.createConnection({
+        host: env.AUTH.bdd_ip,
+        port: env.AUTH.bdd_port,
+        user: 'root',
+        password: 'root',
+        database: 'authentification'
+    });
+}
 
 module.exports = {
     sendMail: function (to, subject, text) {
